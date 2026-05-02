@@ -9,6 +9,4 @@ import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-    List<Appointment> findByPsychologistIdAndAppointmentDateBetween(
-            Long psychologistId, LocalDateTime start, LocalDateTime end);
 }

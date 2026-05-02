@@ -1,4 +1,4 @@
-package com.psychology.demo.service;
+package com.psychology.demo.security;
 
 import com.psychology.demo.entity.User;
 import com.psychology.demo.repo.UserRepository;
@@ -10,19 +10,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı: " + email));
-
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
+     User user=   userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(email+" not found"));
+        MyUserDetails myUserDetails = MyUserDetails.builder().user(user).build();
+        return myUserDetails;
     }
 }

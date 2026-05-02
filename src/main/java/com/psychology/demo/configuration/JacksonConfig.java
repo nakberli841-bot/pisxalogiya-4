@@ -1,4 +1,4 @@
-package com.psychology.demo.configration;
+package com.psychology.demo.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

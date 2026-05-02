@@ -5,9 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PsychologistDetailDTO extends PsychologistResponseDTO {
+public class PsychologistProfileRequest {
+    private String specialty;
+    private Integer experienceYears;
     private String education;
     private String bio;
     private String approach;
-    private List<String> certificates;
+    private List<String> languages;
 }

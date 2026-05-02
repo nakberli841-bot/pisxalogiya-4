@@ -1,28 +1,32 @@
 package com.psychology.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.List;
 
 @Entity
-@Table(name = "questions")
+@Table(name = "test_result_ranges")
 @Getter
 @Setter
-public class Question {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TestResultRange {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Integer minScore;
+    private Integer maxScore;
+
+    private String riskLevel;
+
     @Column(columnDefinition = "TEXT")
-    private String questionText;
+    private String recommendation;
 
     @ManyToOne
     @JoinColumn(name = "psychological_test_id")
     private PsychologicalTest psychologicalTest;
-
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AnswerOption> options;
 }

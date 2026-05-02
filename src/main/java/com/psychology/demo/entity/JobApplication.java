@@ -9,44 +9,43 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "appointments")
+@Table(name = "job_applications")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Appointment {
+public class JobApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Hansı vakansiya üçün müraciət edilib?
+    @ManyToOne
+    @JoinColumn(name = "vacancy_id", nullable = false)
+    private Vacancy vacancy;
+
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
+    private String applicantFullName;
+    private String applicantEmail;
+    private String applicantPhone;
 
-    @ManyToOne
-    @JoinColumn(name = "psychologist_id", nullable = false)
-    private Psychologist psychologist;
+    private String cvFilePath;
 
-
-    @OneToOne
-    @JoinColumn(name = "time_slot_id", nullable = false)
-    private TimeSlot timeSlot;
-
-    private String clientFullName;
-    private String clientPhone;
-    private String clientEmail;
-
+    @Column(columnDefinition = "TEXT")
+    private String coverLetter;
     private String status;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime appliedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        this.appliedAt = LocalDateTime.now();
         if (this.status == null) {
             this.status = "PENDING";
         }

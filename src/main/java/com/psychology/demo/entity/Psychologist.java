@@ -1,10 +1,7 @@
 package com.psychology.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,22 +11,38 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Psychologist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
-    private String lastName;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private String specialty;
     private Integer experienceYears;
-    private String language;
     private Double rating;
+
+    @Column(columnDefinition = "TEXT")
     private String education;
+
+    @Column(columnDefinition = "TEXT")
     private String bio;
+
+    @Column(columnDefinition = "TEXT")
     private String approach;
+
     private String imagePath;
 
-    @OneToMany(mappedBy = "psychologist")
+
+    @ElementCollection
+    @CollectionTable(name = "psychologist_languages", joinColumns = @JoinColumn(name = "psychologist_id"))
+    @Column(name = "language")
+    private List<String> languages;
+
+    @OneToMany(mappedBy = "psychologist", cascade = CascadeType.ALL)
     private List<Appointment> appointments;
 }

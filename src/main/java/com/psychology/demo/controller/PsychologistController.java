@@ -1,30 +1,27 @@
 package com.psychology.demo.controller;
 
-import com.psychology.demo.dto.PsychologistDetailDTO;
-import com.psychology.demo.dto.PsychologistResponseDTO;
+import com.psychology.demo.dto.PsychologistProfileRequest;
+import com.psychology.demo.entity.Psychologist;
 import com.psychology.demo.service.PsychologistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/psychologists")
+@RequestMapping("/api/psychologist")
 @RequiredArgsConstructor
 public class PsychologistController {
     private final PsychologistService psychologistService;
 
-    @GetMapping
-    public ResponseEntity<List<PsychologistResponseDTO>> getAll() {
-        return ResponseEntity.ok(psychologistService.getAllPsychologists());
+    @PostMapping("/profile")
+    public ResponseEntity<String> saveProfile(@RequestBody PsychologistProfileRequest request, Principal principal) {
+        return ResponseEntity.ok(psychologistService.updateOrCreateProfile(request, principal.getName()));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PsychologistDetailDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(psychologistService.getPsychologistById(id));
+    @GetMapping("/profile")
+    public ResponseEntity<Psychologist> getProfile(Principal principal) {
+        return ResponseEntity.ok(psychologistService.getMyProfile(principal.getName()));
     }
 }
