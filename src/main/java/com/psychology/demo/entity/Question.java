@@ -1,5 +1,6 @@
 package com.psychology.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class Question {
     @Column(columnDefinition = "TEXT")
     private String questionText;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "psychological_test_id")
     private PsychologicalTest psychologicalTest;
 

@@ -1,5 +1,6 @@
 package com.psychology.demo.entity;
 
+import com.psychology.demo.enumm.ResultStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,9 @@ public class TestResultRange {
 
     @Column(columnDefinition = "TEXT")
     private String recommendation;
+
+    @Enumerated(EnumType.STRING)
+    private ResultStatus status;
 
     @ManyToOne
     @JoinColumn(name = "psychological_test_id")

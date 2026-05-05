@@ -1,11 +1,14 @@
 package com.psychology.demo.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 
+@Builder
 @Data
 public class QuestionDTO {
+    private Long id;
     private String questionText;
-    private Map<String, Integer> options;
+    private List<AnswerOptionDTO> options;
 }

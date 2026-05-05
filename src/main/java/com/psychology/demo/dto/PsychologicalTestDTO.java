@@ -1,12 +1,16 @@
 package com.psychology.demo.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class TestResponseDTO {
+@Builder
+public class PsychologicalTestDTO {
     private Long id;
     private String name;
     private String description;
     private Integer durationMinutes;
-    private Integer questionCount;
+    private List<QuestionDTO> questions;
 }

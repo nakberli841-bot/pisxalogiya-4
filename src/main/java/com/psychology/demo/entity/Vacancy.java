@@ -1,47 +1,40 @@
 package com.psychology.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "vacancies")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Vacancy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String title;       // İşin adı (məs: Klinik Psixoloq)
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    private String description; // İş barədə ətraflı məlumat
 
-    @Column(columnDefinition = "TEXT")
-    private String requirements;
+    private String companyName; // Klinika və ya şirkət adı
+    private String location;    // Ünvan
+    private String salaryRange; // Maaş aralığı (məs: 800-1200 AZN)
+    private String workType;    // İş rejimi (Tam iş günü, Uzaqdan və s.)
 
-    private String location;
-    private String salaryRange;
+    private LocalDateTime deadline;  // Son müraciət tarixi
+    private LocalDateTime createdAt; // Elanın paylaşıldığı tarix
 
-    private boolean isActive = true;
-
-    private LocalDateTime createdAt;
-
-    @OneToMany(mappedBy = "vacancy", cascade = CascadeType.ALL)
-    private List<JobApplication> applications;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private VacancyCategory vacancyCategory; // Vakansiyanın aid olduğu sahə (məs: Uşaq Psixologiyası)
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 }

@@ -23,6 +23,6 @@ public class PsychologicalTest {
     private String description;
     private Integer durationMinutes;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "psychologicalTest",cascade = CascadeType.ALL)
     private List<Question> questions;
 }

@@ -1,10 +1,12 @@
 package com.psychology.demo.service;
 
+import com.psychology.demo.dto.TokenPair;
 import com.psychology.demo.enumm.Role;
 import com.psychology.demo.dto.AuthenticationRequest;
 import com.psychology.demo.dto.RegisterRequest;
 import com.psychology.demo.entity.User;
 import com.psychology.demo.repo.UserRepository;
+import com.psychology.demo.security.JWTService;
 import com.psychology.demo.security.MyAuthenticationProvider;
 import com.psychology.demo.security.MyUserDetailsService;
 import jdk.jshell.Snippet;
@@ -24,6 +26,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MyAuthenticationProvider authenticationProvider;
+    private final JWTService jwtService;
 
 
     public String register(RegisterRequest request) {
@@ -41,10 +44,9 @@ public class AuthService {
     }
 
     public Authentication login(AuthenticationRequest request) {
-        System.out.println("i am here");
         Authentication authenticate = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken
                 (request.getEmail(), request.getPassword()));
-        System.out.println("i am here2");
+
         return authenticate;
     }
 

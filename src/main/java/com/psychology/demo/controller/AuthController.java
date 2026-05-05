@@ -1,7 +1,6 @@
 package com.psychology.demo.controller;
 
-import com.psychology.demo.dto.AuthenticationRequest;
-import com.psychology.demo.dto.RegisterRequest;
+import com.psychology.demo.dto.*;
 import com.psychology.demo.security.JWTService;
 import com.psychology.demo.security.MyUserDetails;
 import com.psychology.demo.security.MyUserDetailsService;
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 public class AuthController {
     private final AuthService authService;
     private final JWTService jwtService;
+    private final MyUserDetailsService userDetailsService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
@@ -37,13 +37,13 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map> login(@Valid @RequestBody AuthenticationRequest request) {
+    public ResponseEntity<String> login(@Valid @RequestBody AuthenticationRequest request) {
 
         Authentication authentication = authService.login(request);
         UserDetails principal = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generetToken(principal);
-        return ResponseEntity.ok(Map.of("message", "tokeni hec kimlese paylasmayin ve itirmeyin",
-                    "token", token));
+        TokenPair tokenPair = jwtService.generateTokenPair(principal);
+
+        return ResponseEntity.ok("accessToken="+tokenPair.getAccessToken()+" refreshToken="+tokenPair.getRefreshToken());
     }
 
     @GetMapping("/profile")
@@ -58,5 +58,40 @@ public class AuthController {
                 "roles", uniqueRoles
 
         ));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        try {
+            String username = jwtService.refreshAccessToken(request.getRefreshToken());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // Yeni token ctunu yarat (Token Rotation)
+            TokenPair newTokenPair = jwtService.generateTokenPair(userDetails);
+
+            return ResponseEntity.ok(Map.of(
+                    "sonuç", "Token yenilendi",
+                    "AccessToken ", newTokenPair.getAccessToken(),
+                    "RefreshToken", newTokenPair.getRefreshToken()
+            ));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        try {
+            String username = jwtService.getUserNameFromToken(request.getAccessToken());
+            jwtService.revokeAllRefreshTokens(username);
+
+            return ResponseEntity.ok("Logout ugurlu");
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body("Logout ugursuz");
+        }
     }
 }

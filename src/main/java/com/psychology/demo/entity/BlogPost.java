@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,22 +28,16 @@ public class BlogPost {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    private String coverImagePath;
+    private String imageUrl;
 
+    private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
-
-    private LocalDateTime publishedAt;
-
     @PrePersist
     protected void onCreate() {
-        this.publishedAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

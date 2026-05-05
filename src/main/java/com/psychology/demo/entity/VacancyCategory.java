@@ -2,17 +2,15 @@ package com.psychology.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Category {
+public class VacancyCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +22,6 @@ public class Category {
     private String description;
 
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<BlogPost> posts;
+    @OneToMany(mappedBy = "vacancyCategory", cascade = CascadeType.ALL)
+    private List<Vacancy> vacancies;
 }
