@@ -47,17 +47,16 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(@AuthenticationPrincipal MyUserDetails userDetails) {
+    public ResponseEntity<UserDTO> getProfile(@AuthenticationPrincipal MyUserDetails userDetails) {
         String username = userDetails.getUsername();
         List<String> uniqueRoles = userDetails.getAuthorities().stream()
                 .map(auth -> auth.getAuthority().replace("ROLE_", ""))
                 .distinct()
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-                "username", username,
-                "roles", uniqueRoles
-
-        ));
+        UserDTO userDTO=new UserDTO();
+        userDTO.setUsername(username);
+        userDTO.setRole(uniqueRoles);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/refresh")
@@ -69,11 +68,7 @@ public class AuthController {
             // Yeni token ctunu yarat (Token Rotation)
             TokenPair newTokenPair = jwtService.generateTokenPair(userDetails);
 
-            return ResponseEntity.ok(Map.of(
-                    "sonuç", "Token yenilendi",
-                    "AccessToken ", newTokenPair.getAccessToken(),
-                    "RefreshToken", newTokenPair.getRefreshToken()
-            ));
+            return ResponseEntity.ok(newTokenPair);
 
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

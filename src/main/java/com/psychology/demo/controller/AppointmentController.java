@@ -20,7 +20,7 @@ public class AppointmentController {
 
 
     @PostMapping("/book")
-    public ResponseEntity<Map<String,Object>> bookAppointment(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
+    public ResponseEntity<String> bookAppointment(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
 
 
         Appointment appointment = Appointment.builder()
@@ -33,10 +33,7 @@ public class AppointmentController {
 
         Appointment savedAppointment = appointmentService.createAppointment(appointment, requestDTO.getTimeSlotId());
 
-        return ResponseEntity.ok(Map.of("message","ugurlra rezervasiya olundunuz",
-                                          "rezerviayani yaradan",savedAppointment.getClientFullName(),
-                                               "yaradilma tarixi",savedAppointment.getCreatedAt(),
-                                                  "pisxolog",savedAppointment.getPsychologist().getUser().getFullName() ));
+        return ResponseEntity.ok("ugurla yaradildi");
     }
 
 
