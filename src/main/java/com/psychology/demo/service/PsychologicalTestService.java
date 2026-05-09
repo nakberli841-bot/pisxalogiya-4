@@ -4,6 +4,8 @@ import com.psychology.demo.dto.*;
 import com.psychology.demo.entity.AnswerOption;
 import com.psychology.demo.entity.PsychologicalTest;
 import com.psychology.demo.entity.TestResultRange;
+import com.psychology.demo.excception.BusinessLogicException;
+import com.psychology.demo.excception.ResourceNotFoundException;
 import com.psychology.demo.repo.AnswerOptionRepository;
 import com.psychology.demo.repo.PsychologicalTestRepository;
 import com.psychology.demo.repo.QuestionRepository;
@@ -25,7 +27,7 @@ public class PsychologicalTestService {
 
 
     public PsychologicalTestDTO getTestDetails(Long testId) {
-        PsychologicalTest test = testRepository.findFullTestDetails(testId).orElseThrow(() -> new RuntimeException("test tapilmadi"));
+        PsychologicalTest test = testRepository.findFullTestDetails(testId).orElseThrow(() -> new ResourceNotFoundException("test tapilmadi"));
         return PsychologicalTestDTO.builder()
                 .id(test.getId())
                 .name(test.getName())
@@ -59,7 +61,7 @@ public class PsychologicalTestService {
 
         TestResultRange resultRange = resultRangeRepository
                 .findByPsychologicalTestIdAndScoreBetween(request.getTestId(), totalScore)
-                .orElseThrow(() -> new RuntimeException("Bu bal üçün nəticə diapazonu təyin edilməyib"));
+                .orElseThrow(() -> new BusinessLogicException("Bu bal üçün nəticə diapazonu təyin edilməyib"));
 
 
         return TestResultResponse.builder()

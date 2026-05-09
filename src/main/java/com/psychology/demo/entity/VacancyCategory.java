@@ -1,5 +1,6 @@
 package com.psychology.demo.entity;
 
+import com.psychology.demo.enums.CategoryForVacancy;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -16,8 +17,8 @@ public class VacancyCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private CategoryForVacancy name;
 
     private String description;
 

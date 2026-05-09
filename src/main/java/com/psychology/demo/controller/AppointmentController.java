@@ -22,16 +22,7 @@ public class AppointmentController {
     @PostMapping("/book")
     public ResponseEntity<String> bookAppointment(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
 
-
-        Appointment appointment = Appointment.builder()
-                .clientFullName(requestDTO.getCustomerFullName())
-                .clientEmail(requestDTO.getCustomerEmail())
-                .clientPhone(requestDTO.getCustomerPhone())
-                .psychologist(Psychologist.builder().id(requestDTO.getPsychologistId()).build())
-                .build();
-
-
-        Appointment savedAppointment = appointmentService.createAppointment(appointment, requestDTO.getTimeSlotId());
+        appointmentService.createAppointment(requestDTO, requestDTO.getTimeSlotId());
 
         return ResponseEntity.ok("ugurla yaradildi");
     }

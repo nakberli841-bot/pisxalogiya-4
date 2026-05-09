@@ -1,4 +1,4 @@
-package com.psychology.demo.enumm;
+package com.psychology.demo.enums;
 
 public enum ApplicationStatus {
     PENDING,    // Gözləmədə (Müraciət yeni olunub)

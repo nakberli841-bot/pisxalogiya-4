@@ -10,5 +10,6 @@ import java.util.List;
 
 @Repository
 public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
-    List<BlogPost> findByCategoryId(Long categoryId);
+//    List<BlogPost> findByCategoryId(Long categoryId);
+    List<BlogPost> findByBlogCategory_Id(Long categoryId);
 }

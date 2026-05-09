@@ -1,6 +1,7 @@
 package com.psychology.demo.service;
 
 import com.psychology.demo.dto.TimeSlotCreateRequest;
+import com.psychology.demo.dto.TimeSlotResponse;
 import com.psychology.demo.entity.Psychologist;
 import com.psychology.demo.entity.TimeSlot;
 import com.psychology.demo.repo.PsychologistRepository;
@@ -22,7 +23,7 @@ public class TimeSlotService {
     private final PsychologistRepository psychologistRepository;
 
     @Transactional
-    public TimeSlot createSlot(TimeSlotCreateRequest request) {
+    public TimeSlotResponse createSlot(TimeSlotCreateRequest request) {
 
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -37,7 +38,12 @@ public class TimeSlotService {
                 .isBooked(false)//false=yani bu solta hec bir musteri rezerv olunmyaib heleki
                 .build();
 
-        return timeSlotRepository.save(timeSlot);
+         timeSlotRepository.save(timeSlot);
+
+         TimeSlotResponse timeSlotResponse = new TimeSlotResponse();
+         timeSlotResponse.setStartTime(timeSlot.getStartTime());
+         timeSlotResponse.setEndTime(timeSlot.getEndTime());
+         return timeSlotResponse;
     }
 
 

@@ -1,5 +1,6 @@
 package com.psychology.demo.dto;
 
+import com.psychology.demo.enums.CategoryForVacancy;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -17,6 +18,5 @@ public class VacancyDTO {
     private String salaryRange;
     private String workType;
     private LocalDateTime deadline;
-    private Long categoryId;
-    private String categoryName;
+    private CategoryForVacancy categoryName;
 }

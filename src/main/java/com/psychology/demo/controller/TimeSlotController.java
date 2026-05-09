@@ -1,6 +1,8 @@
 package com.psychology.demo.controller;
 
+import com.psychology.demo.dto.TestResultResponse;
 import com.psychology.demo.dto.TimeSlotCreateRequest;
+import com.psychology.demo.dto.TimeSlotResponse;
 import com.psychology.demo.entity.TimeSlot;
 import com.psychology.demo.service.TimeSlotService;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +22,9 @@ public class TimeSlotController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<Map<String,Object>> addSlot( @RequestBody TimeSlotCreateRequest timeSlot) {
-        timeSlotService.createSlot(timeSlot);
-        return ResponseEntity.ok(Map.of( "message","ugurla yaradildi",
-                                      "baslama tarixi",timeSlot.getStartTime()
-                                         ,"bitme tarixi",timeSlot.getEndTime()));
+    public ResponseEntity<TimeSlotResponse> addSlot(@RequestBody TimeSlotCreateRequest timeSlot) {
+        TimeSlotResponse slot = timeSlotService.createSlot(timeSlot);
+        return ResponseEntity.ok(slot);
     }
 
 //bu istifadeciye secilen pisxologun uygun oldugu zaman intervalini verir eger randuvu zamani zaman aralliqi sececekse fronted

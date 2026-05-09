@@ -3,12 +3,15 @@ package com.psychology.demo.service;
 import com.psychology.demo.dto.VacancyDTO;
 import com.psychology.demo.dto.VacancyApplicationRequestDTO;
 import com.psychology.demo.entity.*;
-import com.psychology.demo.enumm.ApplicationStatus;
+import com.psychology.demo.enums.ApplicationStatus;
+import com.psychology.demo.excception.BusinessLogicException;
+import com.psychology.demo.excception.ResourceNotFoundException;
 import com.psychology.demo.repo.UserRepository;
 import com.psychology.demo.repository.VacancyApplicationRepository;
 import com.psychology.demo.repository.VacancyCategoryRepository;
 import com.psychology.demo.repository.VacancyRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VacancyService {
 
-    private final VacancyRepository vacancyRepository;
     private final VacancyCategoryRepository categoryRepository;
     private final VacancyApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final VacancyRepository vacancyRepository;
 
 
 
     @Transactional
     public VacancyDTO createVacancy(VacancyDTO dto) {
-        VacancyCategory category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Vakansiya kateqoriyası tapılmadı!"));
+        VacancyCategory category = categoryRepository.findByName(dto.getCategoryName()).orElseThrow(() -> new ResourceNotFoundException("category not found"));
 
         Vacancy vacancy = Vacancy.builder()
                 .title(dto.getTitle())
@@ -66,15 +68,15 @@ public class VacancyService {
         boolean alreadyApplied = applicationRepository.existsByUserIdAndVacancyId(userId, dto.getVacancyId());
 
         if (alreadyApplied) {
-            throw new RuntimeException("Siz artıq bu vakansiyaya müraciət etmisiniz!");
+            throw new BusinessLogicException("Siz artıq bu vakansiyaya müraciət etmisiniz!");
         }
 
         Vacancy vacancy = vacancyRepository.findById(dto.getVacancyId())
-                .orElseThrow(() -> new RuntimeException("Vakansiya tapılmadı!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Vakansiya tapılmadı!"));
 
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("İstifadəçi tapılmadı!"));
+                .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı!"));
 
 
         VacancyApplication application = VacancyApplication.builder()
@@ -101,7 +103,7 @@ public class VacancyService {
                 .salaryRange(vacancy.getSalaryRange())
                 .workType(vacancy.getWorkType())
                 .deadline(vacancy.getDeadline())
-                .categoryId(vacancy.getVacancyCategory().getId())
+                .categoryName(vacancy.getVacancyCategory().getName())
                 .categoryName(vacancy.getVacancyCategory().getName())
                 .build();
     }

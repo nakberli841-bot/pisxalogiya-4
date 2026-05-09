@@ -1,29 +1,29 @@
 package com.psychology.demo.entity;
 
+import com.psychology.demo.enums.CategoryForBlog;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Category {
+public class BlogCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private CategoryForBlog name;
 
     private String description;
 
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blogCategory", cascade = CascadeType.ALL)
     private List<BlogPost> posts;
 }

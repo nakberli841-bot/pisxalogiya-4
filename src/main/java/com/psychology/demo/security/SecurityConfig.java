@@ -1,6 +1,7 @@
 package com.psychology.demo.security;
 
 
+import com.psychology.demo.excception.SecurityExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,26 +29,37 @@ public class SecurityConfig {
 
     private final MyUserDetailsService userDetailsService;
     private final JWTFilter jwtFilter;
+    private final SecurityExceptionHandler securityExceptionHandler;
 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/vacancies/create").hasRole("DOCTOR")
-                        .requestMatchers(HttpMethod.POST,"/api/blogs/**","/api/categories/**").hasRole("DOCTOR")
-                        .requestMatchers("/api/auth/login", "/api/auth/register","/api/time-slots/available","/api/appointments/book").permitAll()
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(securityExceptionHandler) // 401 üçün
+                        .accessDeniedHandler(securityExceptionHandler)      // 403 üçün
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/auth/register","/api/auth/login","/api/auth/refresh",
+                                "/api/time-slots/available",
+                                "/api/appointments/book",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/psychologist/**","/api/time-slots/create").hasRole("DOCTOR")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/vacancies/create",
+                                "/api/psychologist/**",
+                                "/api/time-slots/create"
+                        ).hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.POST, "/api/blogs/**", "/api/categories/**").hasRole("DOCTOR")
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
     @Bean

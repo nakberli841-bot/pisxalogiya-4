@@ -1,4 +1,5 @@
 package com.psychology.demo.enums;
 
-public enum BlogCategory {
+public enum CategoryForBlog {
+    CLINICAL,DEVELOPMENTAL,SOCIAL,COGNITIVE,POSITIVE;
 }

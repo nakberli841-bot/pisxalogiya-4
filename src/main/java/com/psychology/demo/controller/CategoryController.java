@@ -1,6 +1,6 @@
 package com.psychology.demo.controller;
 
-import com.psychology.demo.dto.CategoryDTO;
+import com.psychology.demo.dto.BlogCategoryDTO;
 import com.psychology.demo.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +16,13 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        return ResponseEntity.ok(categoryService.createCategory(categoryDTO));
+    public ResponseEntity<BlogCategoryDTO> createCategory(@RequestBody BlogCategoryDTO blogCategoryDTO) {
+        return ResponseEntity.ok(categoryService.createCategory(blogCategoryDTO));
     }
 
 
     @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+    public ResponseEntity<List<BlogCategoryDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 }

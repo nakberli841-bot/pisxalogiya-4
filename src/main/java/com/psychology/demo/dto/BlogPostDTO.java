@@ -1,5 +1,6 @@
 package com.psychology.demo.dto;
 
+import com.psychology.demo.enums.CategoryForBlog;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,5 @@ public class BlogPostDTO {
     private String content;
     private String imageUrl;
     private LocalDateTime createdAt;
-    private String categoryName;
+    private CategoryForBlog categoryName;
 }

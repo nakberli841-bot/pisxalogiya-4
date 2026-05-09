@@ -1,4 +1,5 @@
 package com.psychology.demo.enums;
 
-public enum CategoryForVakancy {
+public enum CategoryForVacancy {
+    CLINICAL,COUNSELING,EDUCATIONAL,INDUSTRIAL,NEUROPSYCHOLOGY;
 }

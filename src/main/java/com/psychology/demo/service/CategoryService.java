@@ -1,9 +1,9 @@
 package com.psychology.demo.service;
 
 
-import com.psychology.demo.dto.CategoryDTO;
-import com.psychology.demo.entity.Category;
-import com.psychology.demo.repo.CategoryRepository;
+import com.psychology.demo.dto.BlogCategoryDTO;
+import com.psychology.demo.entity.BlogCategory;
+import com.psychology.demo.repo.BlogCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,28 +13,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryService {
 
-    private final CategoryRepository categoryRepository;
+    private final BlogCategoryRepository blogCategoryRepository;
 
 
-    public CategoryDTO createCategory(CategoryDTO dto) {
-        Category category = Category.builder()
+    public BlogCategoryDTO createCategory(BlogCategoryDTO dto) {
+        BlogCategory blogCategory = BlogCategory.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .build();
 
-        Category savedCategory = categoryRepository.save(category);
+        BlogCategory savedBlogCategory = blogCategoryRepository.save(blogCategory);
 
-        return CategoryDTO.builder()
-                .id(savedCategory.getId())
-                .name(savedCategory.getName())
-                .description(savedCategory.getDescription())
+        return BlogCategoryDTO.builder()
+                .id(savedBlogCategory.getId())
+                .name(savedBlogCategory.getName())
+                .description(savedBlogCategory.getDescription())
                 .build();
     }
 
 
-    public List<CategoryDTO> getAllCategories() {
-        return categoryRepository.findAll().stream()
-                .map(category -> CategoryDTO.builder()
+    public List<BlogCategoryDTO> getAllCategories() {
+        return blogCategoryRepository.findAll().stream()
+                .map(category -> BlogCategoryDTO.builder()
                         .id(category.getId())
                         .name(category.getName())
                         .description(category.getDescription())

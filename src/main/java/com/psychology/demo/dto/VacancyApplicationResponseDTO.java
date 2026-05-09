@@ -1,6 +1,6 @@
 package com.psychology.demo.dto;
 
-import com.psychology.demo.enumm.ApplicationStatus;
+import com.psychology.demo.enums.ApplicationStatus;
 import lombok.*;
 import java.time.LocalDateTime;
 

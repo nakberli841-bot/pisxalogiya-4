@@ -1,6 +1,5 @@
 package com.psychology.demo.dto;
 
-import com.psychology.demo.enumm.Role;
 import lombok.Data;
 
 import java.util.List;

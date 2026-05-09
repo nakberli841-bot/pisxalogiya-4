@@ -1,5 +1,6 @@
 package com.psychology.demo.dto;
 
+import com.psychology.demo.enums.CategoryForBlog;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDTO {
+public class BlogCategoryDTO {
     private Long id;
-    private String name;
+    private CategoryForBlog name;
     private String description;
 }

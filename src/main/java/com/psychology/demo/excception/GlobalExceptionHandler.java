@@ -3,6 +3,9 @@ package com.psychology.demo.excception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import com.psychology.demo.dto.ErrorResponse;
@@ -19,6 +22,15 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Giriş qadağandır: Token tapılmadı və ya səhvdir.");
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Sizin bu əməliyyat üçün səlahiyyətiniz yoxdur.");
+    }
 
     @Hidden
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -77,4 +89,55 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.NOT_FOUND.value(),
+                        "Resurs Tapılmadı",
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ),
+                HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessLogic(BusinessLogicException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.CONFLICT.value(),
+                        "Biznes Məntiqi Xətası",
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ),
+                HttpStatus.CONFLICT
+        );
+    }
+
+    @ExceptionHandler({
+            DisabledException.class,
+            AccountExpiredException.class,
+            LockedException.class,
+            BadCredentialsException.class,
+            CredentialsExpiredException.class
+    })
+    public ResponseEntity<ErrorResponse> handleAuthenticationExceptions(RuntimeException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.UNAUTHORIZED.value(), // 401 Unauthorized
+                        "Autentifikasiya Xətası",
+                        ex.getMessage(),
+                        request.getRequestURI()
+                ),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+
+
+
 }

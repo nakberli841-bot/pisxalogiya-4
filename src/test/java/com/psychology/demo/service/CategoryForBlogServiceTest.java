@@ -1,9 +1,10 @@
 package com.psychology.demo.service;
 
 
-import com.psychology.demo.dto.CategoryDTO;
-import com.psychology.demo.entity.Category;
-import com.psychology.demo.repo.CategoryRepository;
+import com.psychology.demo.dto.BlogCategoryDTO;
+import com.psychology.demo.entity.BlogCategory;
+import com.psychology.demo.enums.CategoryForBlog;
+import com.psychology.demo.repo.BlogCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,27 +19,27 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceTest {
+class CategoryForBlogServiceTest {
 
     @Mock
-    private CategoryRepository categoryRepository;
+    private BlogCategoryRepository blogCategoryRepository;
 
     @InjectMocks
     private CategoryService categoryService;
 
-    private Category testCategory;
-    private CategoryDTO testDto;
+    private BlogCategory testBlogCategory;
+    private BlogCategoryDTO testDto;
 
     @BeforeEach
     void setUp() {
-        testCategory = Category.builder()
+        testBlogCategory = BlogCategory.builder()
                 .id(1L)
-                .name("Klinik Psixologiya")
+                .name(CategoryForBlog.CLINICAL)
                 .description("Bu kateqoriya klinik sahəni əhatə edir")
                 .build();
 
-        testDto = CategoryDTO.builder()
-                .name("Klinik Psixologiya")
+        testDto = BlogCategoryDTO.builder()
+                .name(CategoryForBlog.CLINICAL)
                 .description("Bu kateqoriya klinik sahəni əhatə edir")
                 .build();
     }
@@ -46,41 +47,41 @@ class CategoryServiceTest {
     @Test
     void createCategory_Success() {
 
-        when(categoryRepository.save(any(Category.class))).thenReturn(testCategory);
+        when(blogCategoryRepository.save(any(BlogCategory.class))).thenReturn(testBlogCategory);
 
 
-        CategoryDTO result = categoryService.createCategory(testDto);
+        BlogCategoryDTO result = categoryService.createCategory(testDto);
 
 
         assertNotNull(result);
         assertEquals(1L, result.getId());
         assertEquals(testDto.getName(), result.getName());
-        verify(categoryRepository, times(1)).save(any(Category.class));
+        verify(blogCategoryRepository, times(1)).save(any(BlogCategory.class));
     }
 
     @Test
     void getAllCategories_Success() {
 
-        when(categoryRepository.findAll()).thenReturn(List.of(testCategory));
+        when(blogCategoryRepository.findAll()).thenReturn(List.of(testBlogCategory));
 
 
-        List<CategoryDTO> results = categoryService.getAllCategories();
+        List<BlogCategoryDTO> results = categoryService.getAllCategories();
 
 
         assertNotNull(results);
         assertFalse(results.isEmpty());
         assertEquals(1, results.size());
         assertEquals("Klinik Psixologiya", results.get(0).getName());
-        verify(categoryRepository, times(1)).findAll();
+        verify(blogCategoryRepository, times(1)).findAll();
     }
 
     @Test
     void getAllCategories_EmptyList() {
 
-        when(categoryRepository.findAll()).thenReturn(List.of());
+        when(blogCategoryRepository.findAll()).thenReturn(List.of());
 
 
-        List<CategoryDTO> results = categoryService.getAllCategories();
+        List<BlogCategoryDTO> results = categoryService.getAllCategories();
 
 
         assertTrue(results.isEmpty());

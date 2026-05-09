@@ -1,33 +1,25 @@
 package com.psychology.demo.controller;
 
 import com.psychology.demo.dto.*;
-import com.psychology.demo.security.JWTService;
+import com.psychology.demo.security.JwtService;
 import com.psychology.demo.security.MyUserDetails;
 import com.psychology.demo.security.MyUserDetailsService;
 import com.psychology.demo.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    private final JWTService jwtService;
+    private final JwtService jwtService;
     private final MyUserDetailsService userDetailsService;
 
     @PostMapping("/register")
@@ -37,56 +29,26 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody AuthenticationRequest request) {
-
-        Authentication authentication = authService.login(request);
-        UserDetails principal = (UserDetails) authentication.getPrincipal();
-        TokenPair tokenPair = jwtService.generateTokenPair(principal);
-
-        return ResponseEntity.ok("accessToken="+tokenPair.getAccessToken()+" refreshToken="+tokenPair.getRefreshToken());
+    public ResponseEntity<TokenPair> login(@Valid @RequestBody AuthenticationRequest request) {
+        TokenPair tokenPair = authService.login(request);
+        return ResponseEntity.ok(tokenPair);
     }
 
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getProfile(@AuthenticationPrincipal MyUserDetails userDetails) {
-        String username = userDetails.getUsername();
-        List<String> uniqueRoles = userDetails.getAuthorities().stream()
-                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                .distinct()
-                .collect(Collectors.toList());
-        UserDTO userDTO=new UserDTO();
-        userDTO.setUsername(username);
-        userDTO.setRole(uniqueRoles);
-        return ResponseEntity.ok(userDTO);
+        UserDTO profile = authService.profile(userDetails);
+        return ResponseEntity.ok(profile);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        try {
-            String username = jwtService.refreshAccessToken(request.getRefreshToken());
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // Yeni token ctunu yarat (Token Rotation)
-            TokenPair newTokenPair = jwtService.generateTokenPair(userDetails);
-
-            return ResponseEntity.ok(newTokenPair);
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<TokenPair> refreshToken(@RequestBody RefreshTokenRequest request) {
+        TokenPair tokenPair = authService.refreshToken(request);
+        return ResponseEntity.ok(tokenPair);
     }
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
-        try {
-            String username = jwtService.getUserNameFromToken(request.getAccessToken());
-            jwtService.revokeAllRefreshTokens(username);
-
-            return ResponseEntity.ok("Logout ugurlu");
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body("Logout ugursuz");
-        }
+    public ResponseEntity<String> logout(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(authService.logout(userDetails.getUsername()));
     }
 }

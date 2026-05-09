@@ -1,6 +1,6 @@
 package com.psychology.demo.entity;
 
-import com.psychology.demo.enumm.ResultStatus;
+import com.psychology.demo.enums.ResultStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

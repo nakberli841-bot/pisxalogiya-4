@@ -2,9 +2,10 @@ package com.psychology.demo.service;
 
 import com.psychology.demo.dto.BlogPostDTO;
 import com.psychology.demo.entity.BlogPost;
-import com.psychology.demo.entity.Category;
+import com.psychology.demo.entity.BlogCategory;
+import com.psychology.demo.enums.CategoryForBlog;
 import com.psychology.demo.repo.BlogPostRepository;
-import com.psychology.demo.repo.CategoryRepository;
+import com.psychology.demo.repo.BlogCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,20 +27,20 @@ class BlogServiceTest {
     private BlogPostRepository blogPostRepository;
 
     @Mock
-    private CategoryRepository categoryRepository;
+    private BlogCategoryRepository blogCategoryRepository;
 
     @InjectMocks
     private BlogService blogService;
 
-    private Category testCategory;
+    private BlogCategory testBlogCategory;
     private BlogPost testPost;
     private BlogPostDTO testDto;
 
     @BeforeEach
     void setUp() {
-        testCategory = Category.builder()
+        testBlogCategory = BlogCategory.builder()
                 .id(1L)
-                .name("Psixologiya")
+                .name(CategoryForBlog.CLINICAL)
                 .build();
 
         testPost = BlogPost.builder()
@@ -47,7 +48,7 @@ class BlogServiceTest {
                 .title("Test Başlıq")
                 .content("Test Məzmun")
                 .imageUrl("image.jpg")
-                .category(testCategory)
+                .blogCategory(testBlogCategory)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -62,17 +63,17 @@ class BlogServiceTest {
     void createPost_Success() {
 
         Long categoryId = 1L;
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(testCategory));
+        when(blogCategoryRepository.findById(categoryId)).thenReturn(Optional.of(testBlogCategory));
         when(blogPostRepository.save(any(BlogPost.class))).thenReturn(testPost);
 
 
-        BlogPostDTO result = blogService.createPost(testDto, categoryId);
+        BlogPostDTO result = blogService.createPost(testDto);
 
 
         assertNotNull(result);
         assertEquals(testPost.getTitle(), result.getTitle());
         assertEquals("Psixologiya", result.getCategoryName());
-        verify(categoryRepository, times(1)).findById(categoryId);
+        verify(blogCategoryRepository, times(1)).findById(categoryId);
         verify(blogPostRepository, times(1)).save(any(BlogPost.class));
     }
 
@@ -80,11 +81,11 @@ class BlogServiceTest {
     void createPost_ShouldThrowException_WhenCategoryNotFound() {
 
         Long categoryId = 99L;
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+        when(blogCategoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            blogService.createPost(testDto, categoryId);
+            blogService.createPost(testDto);
         });
 
         assertEquals("Kateqoriya tapılmadı", exception.getMessage());

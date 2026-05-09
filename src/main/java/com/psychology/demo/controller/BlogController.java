@@ -17,9 +17,8 @@ public class BlogController {
 
 
     @PostMapping("/{categoryId}")
-    public ResponseEntity<BlogPostDTO> createPost(@RequestBody BlogPostDTO blogPostDTO,
-                                                  @PathVariable Long categoryId) {
-        return ResponseEntity.ok(blogService.createPost(blogPostDTO, categoryId));
+    public ResponseEntity<BlogPostDTO> createPost(@RequestBody BlogPostDTO blogPostDTO) {
+        return ResponseEntity.ok(blogService.createPost(blogPostDTO));
     }
 
 

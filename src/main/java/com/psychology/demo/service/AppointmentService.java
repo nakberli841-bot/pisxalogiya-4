@@ -1,8 +1,12 @@
 package com.psychology.demo.service;
 
+import com.psychology.demo.dto.AppointmentRequestDTO;
 import com.psychology.demo.entity.Appointment;
+import com.psychology.demo.entity.Psychologist;
 import com.psychology.demo.entity.TimeSlot;
 import com.psychology.demo.entity.User;
+import com.psychology.demo.excception.BusinessLogicException;
+import com.psychology.demo.excception.ResourceNotFoundException;
 import com.psychology.demo.repo.AppointmentRepository;
 import com.psychology.demo.repo.TimeSlotRepository;
 import com.psychology.demo.repo.UserRepository;
@@ -23,7 +27,13 @@ public class AppointmentService {
 
 
     @Transactional
-    public Appointment createAppointment(Appointment appointment, Long timeSlotId) {
+    public Appointment createAppointment(AppointmentRequestDTO requestDTO,Long timeSlotId) {
+        Appointment appointment = Appointment.builder()
+                .clientFullName(requestDTO.getCustomerFullName())
+                .clientEmail(requestDTO.getCustomerEmail())
+                .clientPhone(requestDTO.getCustomerPhone())
+                .psychologist(Psychologist.builder().id(requestDTO.getPsychologistId()).build())
+                .build();
 
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -31,11 +41,11 @@ public class AppointmentService {
                 .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı!"));
 
         TimeSlot slot = timeSlotRepository.findById(timeSlotId)
-                .orElseThrow(() -> new RuntimeException("Seçilmiş vaxt tapılmadı!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Seçilmiş vaxt tapılmadı!"));
 
 
         if (slot.isBooked()) {
-            throw new RuntimeException("Bu vaxt artıq başqa bir istifadəçi tərəfindən rezerv edilib.");
+            throw new BusinessLogicException("Bu vaxt artıq başqa bir istifadəçi tərəfindən rezerv edilib.");
         }
 
         slot.setBooked(true);
@@ -50,7 +60,7 @@ public class AppointmentService {
     @Transactional
     public void cancelAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Görüş tapılmadı!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Görüş tapılmadı!"));
 
 
         TimeSlot slot = appointment.getTimeSlot();

@@ -4,9 +4,11 @@ package com.psychology.demo.service;
 import com.psychology.demo.dto.PsychologistProfileRequest;
 import com.psychology.demo.entity.Psychologist;
 import com.psychology.demo.entity.User;
+import com.psychology.demo.excception.BusinessLogicException;
 import com.psychology.demo.repo.PsychologistRepository;
 import com.psychology.demo.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
@@ -19,7 +21,7 @@ public class PsychologistService {
 
     public String updateOrCreateProfile(PsychologistProfileRequest request, String email) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("İstifadəçi tapılmadı"));
+                .orElseThrow(() -> new UsernameNotFoundException("İstifadəçi tapılmadı"));
 
 
         Psychologist psychologist = psychologistRepo.findByUserEmail(email)
@@ -39,6 +41,6 @@ public class PsychologistService {
 
     public Psychologist getMyProfile(String email) {
         return psychologistRepo.findByUserEmail(email)
-                .orElseThrow(() -> new RuntimeException("Profil hələ yaradılmayıb"));
+                .orElseThrow(() -> new BusinessLogicException("Profil hələ yaradılmayıb"));
     }
 }

@@ -2,6 +2,8 @@ package com.psychology.demo.security;
 
 import com.psychology.demo.dto.TokenPair;
 import com.psychology.demo.entity.RefreshToken;
+import com.psychology.demo.excception.BusinessLogicException;
+import com.psychology.demo.excception.ResourceNotFoundException;
 import com.psychology.demo.repo.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,13 +23,12 @@ import java.util.UUID;
 
 
 @Service
-public class JWTService {
+public class JwtService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
+   private final RefreshTokenRepository refreshTokenRepository;//bunu annnotasiya ile inject etmek mumkun olmadi
+    private final String SECRET_KEY;//bunu ise intilaiz problemine gore manual olaraq inject etdik
 
-    private final String SECRET_KEY;
-
-    public JWTService(RefreshTokenRepository refreshTokenRepository, @Value("${SECRET_KEY}")
+    public JwtService(RefreshTokenRepository refreshTokenRepository, @Value("${SECRET_KEY}")
     String secretKey) {
         this.refreshTokenRepository = refreshTokenRepository;
         SECRET_KEY = secretKey;
@@ -44,7 +45,7 @@ public class JWTService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSingnInKey(SECRET_KEY))
-                .setExpiration(new Date(System.currentTimeMillis() + 100 * 60 * 15))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .claim("role", role)
                 .claim("type", "access")
                 .compact();
@@ -58,22 +59,22 @@ public class JWTService {
         String refreshTokenValue = UUID.randomUUID().toString() + "-" + System.currentTimeMillis();
         LocalDateTime expiryDate = LocalDateTime.now().plusDays(7);
 
-       RefreshToken refreshToken=  new RefreshToken(username, refreshTokenValue, expiryDate);
+       RefreshToken refreshToken=  new RefreshToken(refreshTokenValue, username, expiryDate);
       return refreshTokenRepository.save(refreshToken);
 
     }
 
     // login vaxti deyilde sonrada refresh token ile yeni acces token yaratmaq
     public String refreshAccessToken(String refreshTokenValue) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue).orElseThrow(() -> new RuntimeException("Refresh token bulunamadı"));
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue).orElseThrow(() -> new ResourceNotFoundException("Refresh token tapilmadi"));
 
         if (refreshToken.isExpired()) {
             refreshTokenRepository.delete(refreshToken);
-            throw new RuntimeException("Refresh token vaxti bitib");
+            throw new BusinessLogicException("Refresh token vaxti bitib");
         }
 
         if (refreshToken.isUsed()) {
-            throw new RuntimeException("Refresh token zaten istifade olunub");
+            throw new BusinessLogicException("Refresh token artiq bir defe istifade olunub istifade olunub");
         }
 
         // eks halda tokenin istifadesini true et

@@ -2,6 +2,7 @@ package com.psychology.demo.service;
 
 
 import com.psychology.demo.dto.TimeSlotCreateRequest;
+import com.psychology.demo.dto.TimeSlotResponse;
 import com.psychology.demo.entity.Psychologist;
 import com.psychology.demo.entity.TimeSlot;
 import com.psychology.demo.repo.PsychologistRepository;
@@ -59,8 +60,14 @@ class TimeSlotServiceTest {
     @Test
     void createSlot_Success() {
         TimeSlotCreateRequest request = new TimeSlotCreateRequest();
-        request.setStartTime(LocalDateTime.now().plusDays(1));
-        request.setEndTime(LocalDateTime.now().plusDays(1).plusHours(1));
+        LocalDateTime start = LocalDateTime.now().plusDays(1);
+        LocalDateTime end = start.plusHours(1);
+        request.setStartTime(start);
+        request.setEndTime(end);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn(email);
+        when(psychologistRepository.findByUserEmail(email)).thenReturn(Optional.of(testPsychologist));
 
         TimeSlot savedSlot = TimeSlot.builder()
                 .id(100L)
@@ -69,19 +76,17 @@ class TimeSlotServiceTest {
                 .psychologist(testPsychologist)
                 .isBooked(false)
                 .build();
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getName()).thenReturn(email);
-        when(psychologistRepository.findByUserEmail(email)).thenReturn(Optional.of(testPsychologist));
         when(timeSlotRepository.save(any(TimeSlot.class))).thenReturn(savedSlot);
 
-        TimeSlot result = timeSlotService.createSlot(request);
+        TimeSlotResponse result = timeSlotService.createSlot(request);
 
         assertNotNull(result);
-        assertEquals(100L, result.getId());
-        assertFalse(result.isBooked());
-        assertEquals(testPsychologist, result.getPsychologist());
+        assertEquals(request.getStartTime(), result.getStartTime());
+        assertEquals(request.getEndTime(), result.getEndTime());
+
+
         verify(timeSlotRepository, times(1)).save(any(TimeSlot.class));
+        verify(psychologistRepository, times(1)).findByUserEmail(email);
     }
 
     @Test

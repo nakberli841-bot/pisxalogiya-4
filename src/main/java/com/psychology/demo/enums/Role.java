@@ -1,4 +1,4 @@
-package com.psychology.demo.enumm;
+package com.psychology.demo.enums;
 
 public enum Role {
     USER,ADMIN,DOCTOR;

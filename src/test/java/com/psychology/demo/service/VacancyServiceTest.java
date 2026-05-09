@@ -4,6 +4,7 @@ package com.psychology.demo.service;
 import com.psychology.demo.dto.VacancyApplicationRequestDTO;
 import com.psychology.demo.dto.VacancyDTO;
 import com.psychology.demo.entity.*;
+import com.psychology.demo.enums.CategoryForVacancy;
 import com.psychology.demo.repo.UserRepository;
 import com.psychology.demo.repository.VacancyApplicationRepository;
 import com.psychology.demo.repository.VacancyCategoryRepository;
@@ -42,14 +43,14 @@ class VacancyServiceTest {
 
     @BeforeEach
     void setUp() {
-        testCategory = VacancyCategory.builder().id(1L).name("Klinik Psixologiya").build();
+        testCategory = VacancyCategory.builder().id(1L).name(CategoryForVacancy.CLINICAL).build();
         testVacancy = Vacancy.builder().id(10L).title("Psixoloq").vacancyCategory(testCategory).build();
         testUser = User.builder().id(5L).email("user@test.com").build();
     }
 
     @Test
     void createVacancy_Success() {
-        VacancyDTO dto = VacancyDTO.builder().title("Psixoloq").categoryId(1L).build();
+        VacancyDTO dto = VacancyDTO.builder().title("Psixoloq").categoryName(CategoryForVacancy.CLINICAL).build();
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(testCategory));
         when(vacancyRepository.save(any(Vacancy.class))).thenReturn(testVacancy);
 

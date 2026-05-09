@@ -1,12 +1,13 @@
 package com.psychology.demo.service;
 
 import com.psychology.demo.dto.RegisterRequest;
-import com.psychology.demo.enumm.Role;
+import com.psychology.demo.enums.Role;
 import com.psychology.demo.entity.User;
 import com.psychology.demo.repo.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,10 +22,11 @@ public class AdminService {
 
     @Transactional
     public void transferOwnershipToDoctor(Long doctorId, Long adminId) {
+
         User doctor = userRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Həkim tapılmadı"));
+                .orElseThrow(() -> new UsernameNotFoundException("Həkim tapılmadı"));
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin tapılmadı"));
+                .orElseThrow(() -> new UsernameNotFoundException("Admin tapılmadı"));
 
         doctor.setRole(Role.ADMIN);
 

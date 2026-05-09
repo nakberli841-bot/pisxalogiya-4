@@ -1,9 +1,11 @@
 package com.psychology.demo.service;
 
 
+import com.psychology.demo.dto.AppointmentRequestDTO;
 import com.psychology.demo.entity.Appointment;
 import com.psychology.demo.entity.TimeSlot;
 import com.psychology.demo.entity.User;
+import com.psychology.demo.excception.BusinessLogicException;
 import com.psychology.demo.repo.AppointmentRepository;
 import com.psychology.demo.repo.TimeSlotRepository;
 import com.psychology.demo.repo.UserRepository;
@@ -57,26 +59,30 @@ class AppointmentServiceTest {
 
     @Test
     void createAppointment_Success() {
+        AppointmentRequestDTO requestDTO = new AppointmentRequestDTO();
+        requestDTO.setCustomerFullName("Nurlan");
+        requestDTO.setCustomerEmail("test@example.com");
+        requestDTO.setCustomerPhone("+9940000000");
+        requestDTO.setPsychologistId(1L);
 
         Long slotId = 10L;
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(timeSlotRepository.findById(slotId)).thenReturn(Optional.of(testSlot));
         when(appointmentRepository.save(any(Appointment.class))).thenReturn(testAppointment);
-
-
-        Appointment result = appointmentService.createAppointment(testAppointment, slotId);
-
-
+        Appointment result = appointmentService.createAppointment(requestDTO, slotId);
         assertNotNull(result);
-        assertTrue(testSlot.isBooked());
-        verify(timeSlotRepository, times(1)).save(testSlot); // Save çağırılmalıdır
-        verify(appointmentRepository, times(1)).save(testAppointment);
-    }
+        assertTrue(testSlot.isBooked(), "Slot booked statusu true olmalı idi");
+        verify(timeSlotRepository, times(1)).save(testSlot);
 
+        verify(appointmentRepository, times(1)).save(any(Appointment.class));
+    }
     @Test
     void createAppointment_ShouldThrowException_WhenSlotAlreadyBooked() {
+        AppointmentRequestDTO requestDTO = new AppointmentRequestDTO();
+        requestDTO.setCustomerEmail("test@example.com");
 
         Long slotId = 10L;
         testSlot.setBooked(true);
@@ -86,13 +92,14 @@ class AppointmentServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(timeSlotRepository.findById(slotId)).thenReturn(Optional.of(testSlot));
 
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            appointmentService.createAppointment(testAppointment, slotId);
+        BusinessLogicException exception = assertThrows(BusinessLogicException.class, () -> {
+            appointmentService.createAppointment(requestDTO, slotId);
         });
 
         assertEquals("Bu vaxt artıq başqa bir istifadəçi tərəfindən rezerv edilib.", exception.getMessage());
-        verify(appointmentRepository, never()).save(any()); // Xəta varsa, heç nə yazılmamalıdır
+
+        verify(timeSlotRepository, never()).save(any());
+        verify(appointmentRepository, never()).save(any());
     }
 
     @Test

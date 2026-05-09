@@ -1,6 +1,6 @@
 package com.psychology.demo.entity;
 
-import com.psychology.demo.enumm.ApplicationStatus;
+import com.psychology.demo.enums.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

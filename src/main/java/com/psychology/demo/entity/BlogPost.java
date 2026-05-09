@@ -34,7 +34,7 @@ public class BlogPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category category;
+    private BlogCategory blogCategory;
 
     @PrePersist
     protected void onCreate() {
